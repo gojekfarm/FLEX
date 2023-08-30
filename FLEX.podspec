@@ -41,7 +41,7 @@ Pod::Spec.new do |spec|
        'CLANG_CXX_LANGUAGE_STANDARD' => 'gnu++11',
   }
   spec.compiler_flags   = "-Wno-unsupported-availability-guard", "-Wno-deprecated-declarations"
-  spec.public_header_files = [ "Classes/*.h", "Classes/Manager/*.h", "Classes/Toolbar/*.h",
+  spec.public_header_files = [ "Classes/**/*.h", "Classes/Manager/*.h", "Classes/Toolbar/*.h",
                                "Classes/Core/Controllers/*.h", "Classes/Core/Views/*.h",
                                "Classes/Core/Views/Cells/*.h", "Classes/Core/*.h", 
                                "Classes/Utility/Categories/*.h",
