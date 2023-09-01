@@ -30,7 +30,7 @@ Pod::Spec.new do |spec|
   spec.author           = { "Tanner Bennett" => "tannerbennett@me.com" }
   spec.social_media_url = "https://twitter.com/NSExceptional"
   spec.platform         = :ios, "12.0"
-  spec.source           = { :git => "https://github.com/FLEXTool/FLEX.git", :tag => "#{spec.version}" }
+  spec.source           = { :git => "https://github.com/gojekfarm/FLEX.git", :branch => "flex-xcframework" }
   spec.frameworks       = [ "Foundation", "UIKit", "CoreGraphics", "ImageIO", "QuartzCore", "WebKit", "Security", "SceneKit" ]
   spec.libraries        = [ "z", "sqlite3" ]
   spec.requires_arc     = true
