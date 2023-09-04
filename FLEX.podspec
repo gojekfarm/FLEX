@@ -39,6 +39,7 @@ Pod::Spec.new do |spec|
   spec.pod_target_xcconfig = {
        'CLANG_CXX_LANGUAGE_STANDARD' => 'gnu++11',
   }
+  spec.preserve_paths = '*.hmap',
   spec.compiler_flags   = "-Wno-unsupported-availability-guard", "-Wno-deprecated-declarations"
   spec.public_header_files = [ "Classes/*.h", "Classes/Manager/*.h", "Classes/Toolbar/*.h",
                                "Classes/Core/Controllers/*.h", "Classes/Core/Views/*.h",
