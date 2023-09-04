@@ -13,8 +13,12 @@ FLEX (Flipboard Explorer) is a set of in-app debugging and exploration tools for
 
 ## How to generate headermaps?
 - Headermaps are required to build with Bazel
-- Since this repository is not in active development so we are manually checking-in generated header maps. If this repo goes in active development We can setup lanes to generate header maps.
-- At present, headermap files are generated using this rule - https://github.com/bazel-ios/rules_ios/blob/f5fd9581d154647bf92ef76ff65dd5175e7c88f4/rules/hmap.bzl#L97 
+- To generate a new set of headermaps, cd into Example folder
+    - Run `pod install`
+    - Comment out `xcconfig = {"CLANG_CXX_LANGUAGE_STANDARD": "gnu++11"},` this line from Pods/FLEX/BUILD.bazel file
+    - Run this command `bazel build --config=Debug --ios_multi_cpus=sim_arm64 --xcode_version=14.3.0 --verbose_failures FLEXExample` , right now the build is failing but it generates headermaps.
+    - Copy these two generated hmap files -  `bazel-out/ios-sim_arm64-min9.0-applebin_ios-ios_sim_arm64-dbg-ST-*/bin/Pods/FLEX/FLEX_private_hmap.hmap` and `bazel-out/ios-sim_arm64-min9.0-applebin_ios-ios_sim_arm64-dbg-ST-*/bin/Pods/FLEX/FLEX_public_hmap.hmap`
+    - Replace the headermap files are root with these copied headermap files. 
 - Headermap's are binary files, to inspect its content use this tool - https://github.com/milend/hmap 
 ## Give Yourself Debugging Superpowers
 - Inspect and modify views in the hierarchy.

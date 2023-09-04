@@ -1,0 +1,22 @@
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+
+swift_library(
+   name = "FLEXExampleSources",
+   srcs = glob(["FLEXample/App/**/*.swift"]) + ["FLEXample/AppDelegate.swift"],
+   deps = ["//Pods/FLEX"]
+)
+
+ios_application(
+    name = "FLEXExample",
+    bundle_id = "com.flipboard.flex.FLEXample",
+    families = ["iphone"],
+    infoplists = ["FLEXample/SupportingFiles/Info.plist"],
+    minimum_os_version = "12.0",
+    visibility = ["//visibility:public"],
+    deps = [
+        "FLEXExampleSources",
+    ],
+
+)

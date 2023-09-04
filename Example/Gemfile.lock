@@ -1,0 +1,14 @@
+GEM
+  specs:
+    cocoapods-bazel (0.1.5)
+      starlark_compiler (~> 0.3)
+    starlark_compiler (0.5.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  cocoapods-bazel
+
+BUNDLED WITH
+   2.1.4
