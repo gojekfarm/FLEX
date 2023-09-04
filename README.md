@@ -11,6 +11,11 @@ FLEX (Flipboard Explorer) is a set of in-app debugging and exploration tools for
 <img alt="Demo" width=36% height=36% src=https://user-images.githubusercontent.com/8371943/70185687-e842c800-16af-11ea-8ef9-9e071380a462.gif>
 
 
+## How to generate headermaps?
+- Headermaps are required to build with Bazel
+- Since this repository is not in active development so we are manually checking-in generated header maps. If this repo goes in active development We can setup lanes to generate header maps.
+- At present, headermap files are generated using this rule - https://github.com/bazel-ios/rules_ios/blob/f5fd9581d154647bf92ef76ff65dd5175e7c88f4/rules/hmap.bzl#L97 
+- Headermap's are binary files, to inspect its content use this tool - https://github.com/milend/hmap 
 ## Give Yourself Debugging Superpowers
 - Inspect and modify views in the hierarchy.
 - See the properties and ivars on any object.
