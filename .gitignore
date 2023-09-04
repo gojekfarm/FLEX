@@ -17,6 +17,8 @@ DerivedData
 *.xcuserstate
 .DS_Store
 /Example/Pods
-Podfile.lock
+/Example/Gemfile.lock
+/Example/bazel-*
+
 IDEWorkspaceChecks.plist
 *.xcworkspace
