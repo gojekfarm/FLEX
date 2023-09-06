@@ -1,6 +1,14 @@
 platform :ios, '13.0'
 
+plugin 'cocoapods-bazel', {
+  rules: {
+    'apple_framework' => { load: '@build_bazel_rules_ios//rules:framework.bzl', rule: 'apple_framework' }.freeze,
+    'ios_application' => { load: '@build_bazel_rules_ios//rules:app.bzl', rule: 'ios_application' }.freeze,
+    'ios_unit_test' => { load: '@build_bazel_rules_ios//rules:test.bzl', rule: 'ios_unit_test' }.freeze
+  }.freeze,
+}
+
 target 'FLEXample' do
   project 'FLEXample-Cocoapods'
-  pod 'FLEX', :path => '../'
+  pod 'FLEX', :git => 'https://github.com/gojekfarm/Flex.git', :branch => 'remove-private-api-usage-and-add-header-maps', :modular_headers => true , :configurations => ['Debug']
 end
