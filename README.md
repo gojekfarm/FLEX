@@ -4,6 +4,17 @@
 - This fork adds support for Bazel using headermaps. Reach out to @naik-sanju for details.
   - Refer to the [section below](#how-to-generate-headermaps) for details on generating headermaps for future updates.
 
+### How to publish new versions?
+
+- Update version in podspec
+- Commit and merge this podspec change to master
+- Create a [new github release](https://github.com/gojekfarm/FLEX/releases/new) on this repo with the same tag as the version number in podspec
+- Execute this command and replace `{internal_podspec_repo_name}` with valid values from internal org:
+
+  ```sh
+  pod repo push {internal_podspec_repo_name} FLEX.podspec --allow-warnings
+  ```
+
 # FLEX
 [![CocoaPods](https://img.shields.io/cocoapods/v/FLEX.svg)](https://cocoapods.org/?q=FLEX)
  [![CocoaPods](https://img.shields.io/cocoapods/l/FLEX.svg)](https://github.com/Flipboard/FLEX/blob/master/LICENSE)
