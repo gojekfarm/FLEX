@@ -1,3 +1,9 @@
+## Why does this fork exist?
+
+- This fork adds support for pushing builds with FLEX as a dependency to testflight by removing private API usage. See [this issue](https://github.com/FLEXTool/FLEX/issues/474#issuecomment-798936581) for details as to why this change was not merged into upstream.
+- This fork adds support for Bazel using headermaps. Reach out to @naik-sanju for details.
+  - Refer to the [section below](#how-to-generate-headermaps) for details on generating headermaps for future updates.
+
 # FLEX
 [![CocoaPods](https://img.shields.io/cocoapods/v/FLEX.svg)](https://cocoapods.org/?q=FLEX)
  [![CocoaPods](https://img.shields.io/cocoapods/l/FLEX.svg)](https://github.com/Flipboard/FLEX/blob/master/LICENSE)
@@ -16,7 +22,7 @@ FLEX (Flipboard Explorer) is a set of in-app debugging and exploration tools for
 - To generate a new set of headermaps, cd into Example folder
     - Run `pod install`
     - Comment out `xcconfig = {"CLANG_CXX_LANGUAGE_STANDARD": "gnu++11"},` this line from Pods/FLEX/BUILD.bazel file
-    - Run this command `bazel build --config=Debug --ios_multi_cpus=sim_arm64 --xcode_version=14.3.0 --verbose_failures FLEXExample` , right now the build is failing but it generates headermaps.
+    - Run this command `bazel build --config=Debug --ios_multi_cpus=sim_arm64 --verbose_failures FLEXExample` , right now the build is failing but it generates headermaps.
     - Copy these two generated hmap files -  `bazel-out/ios-sim_arm64-min9.0-applebin_ios-ios_sim_arm64-dbg-ST-*/bin/Pods/FLEX/FLEX_private_hmap.hmap` and `bazel-out/ios-sim_arm64-min9.0-applebin_ios-ios_sim_arm64-dbg-ST-*/bin/Pods/FLEX/FLEX_public_hmap.hmap`
     - Replace the headermap files are root with these copied headermap files. 
 - Headermap's are binary files, to inspect its content use this tool - https://github.com/milend/hmap 
