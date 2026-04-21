@@ -35,12 +35,7 @@ let package = Package(
                 "GlobalStateExplorers/SystemLog/LLVM_LICENSE.TXT",
             ],
             publicHeadersPath: "Headers",
-            cSettings: .headerSearchPaths + .warningFlags,
-            linkerSettings: [
-                .linkedFramework("CoreGraphics"),
-                .linkedLibrary("sqlite3"),
-                .linkedLibrary("z"),
-            ]
+            cSettings: .headerSearchPaths + .warningFlags
         )
     ],
     // Required to compile FLEXSwiftInternal.mm
@@ -56,10 +51,10 @@ extension Array where Element == CSetting {
                 "-Wno-unsupported-availability-guard",
             ])]
         }
-
+        
         return []
     }
-
+    
     /// These are the header search paths needed for FLEX to compile, not
     /// the headers used by projects linking against FLEX.
     ///

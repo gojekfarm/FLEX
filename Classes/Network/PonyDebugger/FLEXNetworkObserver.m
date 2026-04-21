@@ -487,28 +487,16 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
 
         const int numSelectors = sizeof(selectors) / sizeof(SEL);
 
-        // T251807321: Use objc_copyClassList to get a fresh snapshot of registered classes.
-        // This is safer than objc_getClassList because it returns an owned copy that won't
-        // have stale pointers from classes that were unloaded during iteration.
-        unsigned int numClasses = 0;
-        Class *classes = objc_copyClassList(&numClasses);
+        Class *classes = NULL;
+        int numClasses = objc_getClassList(NULL, 0);
 
-        if (numClasses > 0 && classes != NULL) {
-            for (unsigned int classIndex = 0; classIndex < numClasses; ++classIndex) {
+        if (numClasses > 0) {
+            classes = (__unsafe_unretained Class *)malloc(sizeof(Class) * numClasses);
+            numClasses = objc_getClassList(classes, numClasses);
+            for (NSInteger classIndex = 0; classIndex < numClasses; ++classIndex) {
                 Class class = classes[classIndex];
 
-                if (class == NULL || class == [FLEXNetworkObserver class]) {
-                    continue;
-                }
-
-                // Skip metaclasses - we only want to swizzle instance methods on regular classes.
-                if (class_isMetaClass(class)) {
-                    continue;
-                }
-
-                // Double-check the class is still registered by looking it up by name.
-                const char *className = class_getName(class);
-                if (className == NULL || objc_lookUpClass(className) != class) {
+                if (class == [FLEXNetworkObserver class]) {
                     continue;
                 }
 
@@ -519,10 +507,6 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
                 // to the class. That's why we iterate through the method list.
                 unsigned int methodCount = 0;
                 Method *methods = class_copyMethodList(class, &methodCount);
-                if (methods == NULL) {
-                    continue;
-                }
-
                 BOOL matchingSelectorFound = NO;
                 for (unsigned int methodIndex = 0; methodIndex < methodCount; methodIndex++) {
                     for (int selectorIndex = 0; selectorIndex < numSelectors; ++selectorIndex) {
@@ -536,10 +520,10 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
                         break;
                     }
                 }
-
+                
                 free(methods);
             }
-
+            
             free(classes);
         }
 
@@ -552,7 +536,7 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
         Class URLSession = [NSURLSession class];
         [self injectIntoNSURLSessionAsyncDataAndDownloadTaskMethods:URLSession];
         [self injectIntoNSURLSessionAsyncUploadTaskMethods:URLSession];
-
+        
         // At some point, NSURLSession.sharedSession became an __NSURLSessionLocal,
         // which is not the class returned by [NSURLSession class], of course
         Class URLSessionLocal = NSClassFromString(@"__NSURLSessionLocal");
@@ -560,7 +544,7 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
             [self injectIntoNSURLSessionAsyncDataAndDownloadTaskMethods:URLSessionLocal];
             [self injectIntoNSURLSessionAsyncUploadTaskMethods:URLSessionLocal];
         }
-
+        
         if (@available(iOS 13.0, *)) {
             Class websocketTask = NSClassFromString(@"__NSURLSessionWebSocketTask");
             [self injectWebsocketSendMessage:websocketTask];
@@ -683,20 +667,18 @@ static FIRDocumentReference * _logos_method$_ungrouped$FIRCollectionReference$ad
     Method originalResume = class_getInstanceMethod(class, selector);
     IMP implementation = imp_implementationWithBlock(^(NSURLSessionTask *slf) {
         
-        if (@available(iOS 11.0, *)) {
-            // AVAggregateAssetDownloadTask deeply does not like to be looked at. Accessing -currentRequest or
-            // -originalRequest will crash. Do not try to observe these. https://github.com/FLEXTool/FLEX/issues/276
-            if (![slf isKindOfClass:[AVAggregateAssetDownloadTask class]]) {
-                // iOS's internal HTTP parser finalization code is mysteriously not thread safe,
-                // invoking it asynchronously has a chance to cause a `double free` crash.
-                // This line below will ask for HTTPBody synchronously, make the HTTPParser
-                // parse the request, and cache them in advance. After that the HTTPParser
-                // will be finalized. Make sure other threads inspecting the request
-                // won't trigger a race to finalize the parser.
-                [slf.currentRequest HTTPBody];
+        // AVAggregateAssetDownloadTask deeply does not like to be looked at. Accessing -currentRequest or
+        // -originalRequest will crash. Do not try to observe these. https://github.com/FLEXTool/FLEX/issues/276
+        if (![slf isKindOfClass:[AVAggregateAssetDownloadTask class]]) {
+            // iOS's internal HTTP parser finalization code is mysteriously not thread safe,
+            // invoking it asynchronously has a chance to cause a `double free` crash.
+            // This line below will ask for HTTPBody synchronously, make the HTTPParser
+            // parse the request, and cache them in advance. After that the HTTPParser
+            // will be finalized. Make sure other threads inspecting the request
+            // won't trigger a race to finalize the parser.
+            [slf.currentRequest HTTPBody];
 
-                [FLEXNetworkObserver.sharedObserver URLSessionTaskWillResume:slf];
-            }
+            [FLEXNetworkObserver.sharedObserver URLSessionTaskWillResume:slf];
         }
 
         ((void(*)(id, SEL))objc_msgSend)(
@@ -2003,12 +1985,10 @@ didFinishDownloadingToURL:(NSURL *)location data:(NSData *)data
 }
 
 - (void)URLSessionTaskWillResume:(NSURLSessionTask *)task {
-    if (@available(iOS 11.0, *)) {
-        // AVAggregateAssetDownloadTask deeply does not like to be looked at. Accessing -currentRequest or
-        // -originalRequest will crash. Do not try to observe these. https://github.com/FLEXTool/FLEX/issues/276
-        if ([task isKindOfClass:[AVAggregateAssetDownloadTask class]]) {
-            return;
-        }
+    // AVAggregateAssetDownloadTask deeply does not like to be looked at. Accessing -currentRequest or
+    // -originalRequest will crash. Do not try to observe these. https://github.com/FLEXTool/FLEX/issues/276
+    if ([task isKindOfClass:[AVAggregateAssetDownloadTask class]]) {
+        return;
     }
 
     // Since resume can be called multiple times on the same task, only treat the first resume as

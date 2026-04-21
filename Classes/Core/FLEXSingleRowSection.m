@@ -86,12 +86,4 @@
     return self.lastSubitle;
 }
 
-- (NSArray<NSString *> *)copyMenuItemsForRow:(NSInteger)row {
-    NSString *const text = [self titleForRow:row];
-    if (text.length) {
-        return @[@"Text", text];
-    }
-    return nil;
-}
-
 @end

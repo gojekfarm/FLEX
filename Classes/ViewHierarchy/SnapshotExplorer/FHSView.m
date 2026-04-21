@@ -88,11 +88,8 @@
 @implementation FHSView (Snapshotting)
 
 + (UIImage *)drawView:(UIView *)view {
-    if (CGRectIsEmpty(view.bounds)) {
-        return [UIImage new];
-    }
-
     CGSize size = view.bounds.size;
+    CGRect bounds = view.bounds;
     CGFloat minUnit = 1.f / UIScreen.mainScreen.scale;
 
     // Every drawn view must not have 0 width or height
@@ -123,7 +120,7 @@
     }
 
     if (!rootView.isHidden) {
-        [self _setHidden:YES forView:rootView];
+        rootView.hidden = YES;
         [hiddenViews addObject:rootView];
     }
 
@@ -140,7 +137,7 @@
     }
 
     for (UIView *v in viewsToUnhide) {
-        [self _setHidden:NO forView:v];
+        v.hidden = NO;
     }
 }
 
@@ -188,7 +185,7 @@
     NSMutableIndexSet *toUnhide = [NSMutableIndexSet new];
     [view.subviews flex_forEach:^(UIView *v, NSUInteger idx) {
         if (!v.isHidden) {
-            [self _setHidden:YES forView:v];
+            v.hidden = YES;
             [toUnhide addIndex:idx];
         }
     }];
@@ -196,22 +193,10 @@
     // Snapshot the view, then unhide the previously-unhidden views
     UIImage *snapshot = [self drawView:view];
     for (UIView *v in [view.subviews objectsAtIndexes:toUnhide]) {
-        [self _setHidden:NO forView:v];
+        v.hidden = NO;
     }
 
     return snapshot;
-}
-
-+ (void)_setHidden:(BOOL)hidden forView:(UIView *)view {
-    // SpringBoard's SBHomeGrabberView responds to setHidden: but raises an exception
-    // if you try to use it.
-    // Catching the exception is less fragile than hardcoding classes to ignore
-    @try {
-        view.hidden = hidden;
-    } @catch (NSException *exception) {
-        NSString *hidingOrUnhiding = hidden ? @"hiding" : @"unhiding";
-        NSLog(@"Exception raised when %@ view %@: %@", hidingOrUnhiding, view, exception);
-    }
 }
 
 @end
