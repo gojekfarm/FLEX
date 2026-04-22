@@ -28,26 +28,25 @@
     if (status == errSecSuccess) {//item already exists, update it!
         query = [[NSMutableDictionary alloc]init];
         query[(__bridge id)kSecValueData] = self.passwordData;
-        #if __IPHONE_4_0 && TARGET_OS_IPHONE
+#if __IPHONE_4_0 && TARGET_OS_IPHONE
         CFTypeRef accessibilityType = FLEXKeychain.accessibilityType;
         if (accessibilityType) {
             query[(__bridge id)kSecAttrAccessible] = (__bridge id)accessibilityType;
         }
-        #endif
+#endif
         status = SecItemUpdate((__bridge CFDictionaryRef)(searchQuery), (__bridge CFDictionaryRef)(query));
-    }
-    else if (status == errSecItemNotFound){//item not found, create it!
+    }else if (status == errSecItemNotFound){//item not found, create it!
         query = [self query];
         if (self.label) {
             query[(__bridge id)kSecAttrLabel] = self.label;
         }
         query[(__bridge id)kSecValueData] = self.passwordData;
-        #if __IPHONE_4_0 && TARGET_OS_IPHONE
+#if __IPHONE_4_0 && TARGET_OS_IPHONE
         CFTypeRef accessibilityType = FLEXKeychain.accessibilityType;
         if (accessibilityType) {
             query[(__bridge id)kSecAttrAccessible] = (__bridge id)accessibilityType;
         }
-        #endif
+#endif
         status = SecItemAdd((__bridge CFDictionaryRef)query, NULL);
     }
     
@@ -70,9 +69,9 @@
     }
     
     NSMutableDictionary *query = [self query];
-    #if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
     status = SecItemDelete((__bridge CFDictionaryRef)query);
-    #else
+#else
     // On Mac OS, SecItemDelete will not delete a key created in a different
     // app, nor in a different version of the same app.
     //
@@ -89,7 +88,7 @@
         status = SecKeychainItemDelete((SecKeychainItemRef)result);
         CFRelease(result);
     }
-    #endif
+#endif
     
     if (status != errSecSuccess && error != NULL) {
         *error = [self errorWithCode:status];
@@ -103,12 +102,12 @@
     NSMutableDictionary *query = [self query];
     query[(__bridge id)kSecReturnAttributes] = @YES;
     query[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitAll;
-    #if __IPHONE_4_0 && TARGET_OS_IPHONE
+#if __IPHONE_4_0 && TARGET_OS_IPHONE
     CFTypeRef accessibilityType = FLEXKeychain.accessibilityType;
     if (accessibilityType) {
         query[(__bridge id)kSecAttrAccessible] = (__bridge id)accessibilityType;
     }
-    #endif
+#endif
     
     CFTypeRef result = NULL;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
@@ -150,6 +149,21 @@
 
 #pragma mark - Accessors
 
+- (void)setPasswordObject:(id<NSCoding>)object {
+    self.passwordData = [NSKeyedArchiver archivedDataWithRootObject:object requiringSecureCoding:NO error:nil];
+}
+
+
+- (id<NSCoding>)passwordObject {
+    if (self.passwordData.length) {
+        NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:self.passwordData error:nil];
+        unarchiver.requiresSecureCoding = NO;
+        return [unarchiver decodeObjectForKey:NSKeyedArchiveRootObjectKey];
+    }
+    
+    return nil;
+}
+
 
 - (void)setPassword:(NSString *)password {
     self.passwordData = [password dataUsingEncoding:NSUTF8StringEncoding];
@@ -169,11 +183,11 @@
 
 #ifdef FLEXKEYCHAIN_SYNCHRONIZATION_AVAILABLE
 + (BOOL)isSynchronizationAvailable {
-    #if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
     return YES;
-    #else
+#else
     return floor(NSFoundationVersionNumber) > NSFoundationVersionNumber10_8_4;
-    #endif
+#endif
 }
 #endif
 
@@ -192,15 +206,15 @@
         dictionary[(__bridge id)kSecAttrAccount] = self.account;
     }
     
-    #ifdef FLEXKEYCHAIN_ACCESS_GROUP_AVAILABLE
-    #if !TARGET_IPHONE_SIMULATOR
+#ifdef FLEXKEYCHAIN_ACCESS_GROUP_AVAILABLE
+#if !TARGET_IPHONE_SIMULATOR
     if (self.accessGroup) {
         dictionary[(__bridge id)kSecAttrAccessGroup] = self.accessGroup;
     }
-    #endif
-    #endif
+#endif
+#endif
     
-    #ifdef FLEXKEYCHAIN_SYNCHRONIZATION_AVAILABLE
+#ifdef FLEXKEYCHAIN_SYNCHRONIZATION_AVAILABLE
     if ([[self class] isSynchronizationAvailable]) {
         id value;
         
@@ -221,7 +235,7 @@
         
         dictionary[(__bridge id)(kSecAttrSynchronizable)] = value;
     }
-    #endif
+#endif
     
     return dictionary;
 }
@@ -239,7 +253,7 @@
         case errSecSuccess: return nil;
         case FLEXKeychainErrorBadArguments: message = NSLocalizedStringFromTableInBundle(@"FLEXKeychainErrorBadArguments", @"FLEXKeychain", resourcesBundle, nil); break;
             
-        #if TARGET_OS_IPHONE
+#if TARGET_OS_IPHONE
         case errSecUnimplemented: {
             message = NSLocalizedStringFromTableInBundle(@"errSecUnimplemented", @"FLEXKeychain", resourcesBundle, nil);
             break;
@@ -279,10 +293,10 @@
         default: {
             message = NSLocalizedStringFromTableInBundle(@"errSecDefault", @"FLEXKeychain", resourcesBundle, nil);
         }
-        #else
+#else
         default:
             message = (__bridge_transfer NSString *)SecCopyErrorMessageString(code, NULL);
-        #endif
+#endif
     }
     
     NSDictionary *userInfo = message ? @{ NSLocalizedDescriptionKey : message } : nil;

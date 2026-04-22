@@ -19,7 +19,7 @@ CFSetRef FLEXKnownUnsafeIvars = nil;
     (class_getInstanceVariable([cls class], name) ?: (void *)kCFNull)
 
 __attribute__((constructor))
-static void FLEXRuntimeSafteyInit(void) {
+static void FLEXRuntimeSafteyInit() {
     FLEXKnownUnsafeClasses = CFSetCreate(
         kCFAllocatorDefault,
         (const void **)(uintptr_t)FLEXKnownUnsafeClassList(),
@@ -39,7 +39,7 @@ static void FLEXRuntimeSafteyInit(void) {
     );
 }
 
-const Class * FLEXKnownUnsafeClassList(void) {
+const Class * FLEXKnownUnsafeClassList() {
     if (!_UnsafeClasses) {
         const Class ignored[] = {
             FLEXClassPointerOrCFNull(@"__ARCLite__"),
@@ -74,7 +74,7 @@ const Class * FLEXKnownUnsafeClassList(void) {
     return _UnsafeClasses;
 }
 
-NSSet * FLEXKnownUnsafeClassNames(void) {
+NSSet * FLEXKnownUnsafeClassNames() {
     static NSSet *set = nil;
     if (!set) {
         NSArray *ignored = @[

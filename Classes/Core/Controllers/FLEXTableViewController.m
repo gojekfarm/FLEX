@@ -96,11 +96,7 @@ CGFloat const kFLEXDebounceForExpensiveIO = 0.5;
         self.searchController.searchBar.placeholder = @"Filter";
         self.searchController.searchResultsUpdater = (id)self;
         self.searchController.delegate = (id)self;
-        if (@available(iOS 9.1, *)) {
-            self.searchController.obscuresBackgroundDuringPresentation = NO;
-        } else {
-            self.searchController.dimsBackgroundDuringPresentation = NO;
-        }
+        self.searchController.dimsBackgroundDuringPresentation = NO;
         self.searchController.hidesNavigationBarDuringPresentation = NO;
         /// Not necessary in iOS 13; remove this when iOS 13 is the minimum deployment target
         self.searchController.searchBar.delegate = self;
@@ -213,8 +209,6 @@ CGFloat const kFLEXDebounceForExpensiveIO = 0.5;
     self.view = [FLEXTableView style:self.style];
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
-    
-    self.tableView.estimatedRowHeight = 10;
     
     _shareToolbarItem = FLEXBarButtonItemSystem(Action, self, @selector(shareButtonPressed:));
     _bookmarksToolbarItem = [UIBarButtonItem

@@ -11,19 +11,13 @@
 @class FLEXWindow;
 @protocol FLEXExplorerViewControllerDelegate;
 
-NS_ASSUME_NONNULL_BEGIN
-
 /// A view controller that manages the FLEX toolbar.
 @interface FLEXExplorerViewController : UIViewController
 
-@property (nonatomic, weak, nullable) id <FLEXExplorerViewControllerDelegate> delegate;
+@property (nonatomic, weak) id <FLEXExplorerViewControllerDelegate> delegate;
 @property (nonatomic, readonly) BOOL wantsWindowToBecomeKey;
 
 @property (nonatomic, readonly) FLEXExplorerToolbar *explorerToolbar;
-
-/// A predicate block that returns YES if the given view should be excluded
-/// from tap-to-select. Set by FLEXManager from the skipped view predicate.
-@property (nonatomic, copy, nullable) BOOL (^skippedViewPredicate)(UIView *view);
 
 - (BOOL)shouldReceiveTouchAtWindowPoint:(CGPoint)pointInWindowCoordinates;
 
@@ -33,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// If a tool is already presented, this method simply dismisses it and calls the completion block.
 /// If no tool is presented, @code future() @endcode is presented and the completion block is called.
 - (void)toggleToolWithViewControllerProvider:(UINavigationController *(^)(void))future
-                                  completion:(void (^_Nullable)(void))completion;
+                                  completion:(void (^)(void))completion;
 
 /// @brief Used to present (or dismiss) a modal view controller ("tool"),
 /// typically triggered by pressing a button in the toolbar.
@@ -41,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// If a tool is already presented, this method dismisses it and presents the given tool.
 /// The completion block is called once the tool has been presented.
 - (void)presentTool:(UINavigationController *(^)(void))future
-         completion:(void (^_Nullable)(void))completion;
+         completion:(void (^)(void))completion;
 
 // Keyboard shortcut helpers
 
@@ -65,5 +59,3 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol FLEXExplorerViewControllerDelegate <NSObject>
 - (void)explorerViewControllerDidFinish:(FLEXExplorerViewController *)explorerViewController;
 @end
-
-NS_ASSUME_NONNULL_END

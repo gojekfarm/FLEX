@@ -14,7 +14,7 @@
 #import <objc/runtime.h>
 #import <zlib.h>
 
-BOOL FLEXConstructorsShouldRun(void) {
+BOOL FLEXConstructorsShouldRun() {
     #if FLEX_DISABLE_CTORS
         return NO;
     #else
@@ -411,11 +411,6 @@ BOOL FLEXConstructorsShouldRun(void) {
         }
     }
     return inflatedData;
-}
-
-+ (BOOL)hasCompressedContentEncoding:(NSURLRequest *)request {
-    NSString *contentEncoding = [request valueForHTTPHeaderField:@"Content-Encoding"];
-    return ([contentEncoding rangeOfString:@"deflate" options:NSCaseInsensitiveSearch].length > 0 || [contentEncoding rangeOfString:@"gzip" options:NSCaseInsensitiveSearch].length > 0);
 }
 
 + (NSArray<UIWindow *> *)allWindows {
